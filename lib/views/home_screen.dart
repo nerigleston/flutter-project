@@ -38,21 +38,54 @@ class _HomeScreenState extends State<HomeScreen> {
     carregarFilmes();
   }
 
-  void _editarFilme(Filme filme) async {
-    bool? atualizado = await Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => EditarFilmeScreen(filme: filme)),
+  void _mostrarOpcoes(Filme filme) {
+    showModalBottomSheet(
+      context: context,
+      builder: (BuildContext context) {
+        return Container(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              ListTile(
+                title: Text('Exibir Dados'),
+                onTap: () {
+                  Navigator.pop(context);
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => DetalhesFilmeScreen(filme: filme),
+                    ),
+                  );
+                },
+              ),
+              ListTile(
+                title: Text('Alterar'),
+                onTap: () {
+                  Navigator.pop(context);
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => EditarFilmeScreen(filme: filme),
+                    ),
+                  ).then((atualizado) {
+                    if (atualizado == true) {
+                      carregarFilmes();
+                    }
+                  });
+                },
+              ),
+            ],
+          ),
+        );
+      },
     );
-    if (atualizado == true) {
-      carregarFilmes();
-    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Gerenciador de Filmes'),
+        title: Text('Filmes'),
         actions: [
           IconButton(
             icon: Icon(Icons.info),
@@ -97,18 +130,8 @@ class _HomeScreenState extends State<HomeScreen> {
               leading: _buildImage(filme.urlImagem),
               title: Text(filme.titulo),
               subtitle: Text(filme.genero),
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => DetalhesFilmeScreen(filme: filme),
-                  ),
-                );
-              },
-              trailing: IconButton(
-                icon: Icon(Icons.edit),
-                onPressed: () => _editarFilme(filme),
-              ),
+              onTap: () => _mostrarOpcoes(filme),
+              // Removido o trailing icon button para match com o design da imagem
             ),
           );
         },
